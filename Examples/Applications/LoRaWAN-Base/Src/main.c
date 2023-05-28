@@ -75,6 +75,18 @@ int main(void) {
 
 
 	LORAWAN_init(DEFAULT_REGION);
+	LORAWAN_tick();
+	lora_AppData_t tx_payload;
+	uint8_t payload[] = {"HelloWorld"};
+
+	tx_payload.Buff = payload;
+	tx_payload.BuffSize = strlen((char *)payload);
+	tx_payload.Port = LORAWAN_APP_PORT;
+
+	lorawan_send(&tx_payload);
+
+	printf("Teste\n");
+
 	while (1){
 		LORAWAN_tick();
 	}

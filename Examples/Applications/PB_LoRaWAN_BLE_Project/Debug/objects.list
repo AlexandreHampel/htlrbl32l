@@ -102,4 +102,5 @@
 "src/rtc.o"
 "src/spi.o"
 "src/syscalls.o"
+"src/tcc.o"
 "src/uart.o"

@@ -13,12 +13,25 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tcc.h"
 
 #include "ht_crypto.h"
 #include "stsafea_core.h"
 #include "i2c.h"
 #include "crc.h"
 #include "peripheral_init.h"
+#include "uart.h"
+#include "spi.h"
+#include "rtc.h"
+#include "sx126x.h"
+#include "sx126x_board.h"
+#include "radio.h"
+#include "peripheral_init.h"
+#include "lorawan_setup.h"
+#include "lora-test.h"
+#include "LoRaMac.h"
+#include "hal_wrappers.h"
+#include "stsafea_core.h"
 
 NO_INIT(uint32_t dyn_alloc_a[DYNAMIC_MEMORY_SIZE >> 2]);
 
@@ -31,6 +44,8 @@ RNG_HandleTypeDef hrng;
  */
 int main(void) {
 	uint8_t status_code = 0;
+	WakeupSourceConfig_TypeDef wakeupIO;
+	PowerSaveLevels stopLevel;
 
 	/* System initialization function */
 	//if (SystemInit(SYSCLK_64M, BLE_SYSCLK_NONE) != SUCCESS) {
@@ -40,17 +55,19 @@ int main(void) {
 	}
 	HAL_Init();
 	IRQHandler_Config();
+	//HAL_NVIC_DisableIRQ(GPIOA_IRQn);
 	MX_GPIO_Init();
 	MX_USART1_UART_Init();
 	MX_GPIO_LP_Init();
 	MX_SPI1_Init();
-	MX_I2C2_Init();
 	MX_CRC_Init();
 	MX_RTC_Init();
 	MX_RNG_Init(&hrng);
 
-#ifdef HT_CRYPTO
+	MX_I2C2_Init();
+	HAL_I2C_MspInit(&hi2c);
 
+#ifdef HT_CRYPTO
 	if(keys_provisioned()){
 		status_code = ht_crypto_init();
 		if(status_code){
@@ -63,26 +80,42 @@ int main(void) {
 	}
 #endif
 
-	printf("HTLRBL32L - Push Button LoRaWAN + Bluetooth Application\n");
-
 	LORAWAN_init(DEFAULT_REGION);
 	while(!LORA_JoinStatus()){ // wait for join accept
 		LORAWAN_tick();
 	}
+	//HAL_Delay(5000);
 
-	ModulesInit();
 
-	HT_BLE_BleConfig();
-	HT_BLE_SetDeviceConnectable();
+	printf("Bem vindo!\n");
+	printf("Por favor, escolha um orgao para monitorar:\n");
+	printf("1 - DEMO TEMPO\n");
+	printf("2 - DEMO TEMPERATURA\n");
+	printf("3 - Coracao\n");
+	printf("4 - Pulmao\n");
+	printf("5 - Figado\n");
+	printf("6 - Rim\n");
+	printf("7 - Pancreas\n");
 
-	HT_PB_ConfigWakeupIO();
+	led();
+	ledReset();
+	startButton();
+	health();
+	timerStart();
 
-	HT_PB_Counter_init();
 
 	while (1){
-		ModulesTick();
-		LORAWAN_tick();
-		HT_PB_app();
+		if(returnStatus() == 0){
+			temp();
+			timer();
+			check();
+			reportTemp();
+			SX126xCheckDeviceReady();
+			printf("RADIO PRONTO\n");
+			LORAWAN_tick();
+			sendLoraFrame();
+			HAL_Delay(100000);
+			}
 	}
 
 }

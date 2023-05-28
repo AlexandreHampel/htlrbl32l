@@ -28,6 +28,7 @@
 #include "hal_wrappers.h"
 #include "ht_crypto.h"
 #include "stsafea_core.h"
+#include <LoRa.h>
 
 RNG_HandleTypeDef hrng;
 
@@ -87,6 +88,17 @@ int main(void) {
 	
 	while (1){
 		LORAWAN_tick();
+
+		lora_AppData_t tx_payload;
+		uint8_t payload[] = {"HelloWorld"};
+
+		tx_payload.Buff = payload;
+		tx_payload.BuffSize = strlen((char *)payload);
+		tx_payload.Port = LORAWAN_APP_PORT;
+
+		lorawan_send(&tx_payload);
+
+		printf("teste\n");
 		HT_PB_Fsm();
 	}
 }
@@ -127,5 +139,4 @@ void assert_failed(uint8_t* file, uint32_t line)
 	}
 }
 #endif /* USE_FULL_ASSERT */
-
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

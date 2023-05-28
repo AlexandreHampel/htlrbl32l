@@ -143,7 +143,9 @@ void lorawan_send(lora_AppData_t *appData){
   }
 	appData->BuffSize = strlen((const char*)appData->Buff);
 
-//  printf("\nSending LoRaWAN Payload: \"%s\"", appData->Buff);
+	printf("Sending LoRaWAN Payload: %s\n", appData->Buff);
+	printf("Sending LoRaWAN BuffSize: %s\n", appData->BuffSize);
+	printf("Sending LoRaWAN Port: %d\n", appData->Port);
   LORA_send( appData, LORAWAN_DEFAULT_CONFIRM_MSG_STATE);
 	
 	

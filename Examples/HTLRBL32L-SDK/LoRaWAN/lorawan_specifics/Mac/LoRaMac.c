@@ -2370,6 +2370,7 @@ LoRaMacStatus_t Send( LoRaMacHeader_t* macHdr, uint8_t fPort, void* fBuffer, uin
 
     // Prepare the frame
     status = PrepareFrame( macHdr, &fCtrl, fPort, fBuffer, fBufferSize );
+	printf("status frame: %d\n", status);
     // Validate status
     if( ( status == LORAMAC_STATUS_OK ) || ( status == LORAMAC_STATUS_SKIPPED_APP_DATA ) )
     {
@@ -2379,6 +2380,7 @@ LoRaMacStatus_t Send( LoRaMacHeader_t* macHdr, uint8_t fPort, void* fBuffer, uin
     }
 
     // Post processing
+	printf("status tx: %d\n", status);
     if( status != LORAMAC_STATUS_OK )
     {
         // Bad case - restore
@@ -4727,6 +4729,7 @@ LoRaMacStatus_t LoRaMacMcpsRequest( McpsReq_t* mcpsRequest )
     // Some regions have limitations for the minimum datarate.
     datarate = MAX( datarate, ( int8_t )phyParam.Value );
 
+    printf("readyToSend = %d\n", readyToSend);
     if( readyToSend == true )
     {
 
@@ -4748,6 +4751,7 @@ LoRaMacStatus_t LoRaMacMcpsRequest( McpsReq_t* mcpsRequest )
         }
 
         status = Send( &macHdr, fPort, fBuffer, fBufferSize );
+        printf("status = %d\n", status);
         if( status == LORAMAC_STATUS_OK )
         {
 

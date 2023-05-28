@@ -717,11 +717,13 @@ bool LORA_send(lora_AppData_t* AppData, LoraConfirm_t IsTxConfirmed)
     McpsReq_t mcpsReq;
     LoRaMacTxInfo_t txInfo;
     /*if certification test are on going, application data is not sent*/
+    printf("Esta rodando = %d \n", get_certif_running());
     if (get_certif_running() == true)
     {
       return false;
     }
     
+    printf("LORAMAC_STATUS_OK = %d \n", LoRaMacQueryTxPossible( AppData->BuffSize, &txInfo ));
     if( LoRaMacQueryTxPossible( AppData->BuffSize, &txInfo ) != LORAMAC_STATUS_OK )
     {
         // Send empty frame in order to flush MAC commands
@@ -733,6 +735,7 @@ bool LORA_send(lora_AppData_t* AppData, LoraConfirm_t IsTxConfirmed)
     }
     else
     {
+    	printf("LORAWAN_UNCONFIRMED_MSG = %d \n", IsTxConfirmed);
         if( IsTxConfirmed == LORAWAN_UNCONFIRMED_MSG )
         {
             mcpsReq.Type = MCPS_UNCONFIRMED;
@@ -751,6 +754,8 @@ bool LORA_send(lora_AppData_t* AppData, LoraConfirm_t IsTxConfirmed)
             mcpsReq.Req.Confirmed.Datarate = LoRaParamInit->TxDatarate;
         }
     }
+
+    printf("Esta rodando 2 = %d \n", LoRaMacMcpsRequest( &mcpsReq ));
     if( LoRaMacMcpsRequest( &mcpsReq ) == LORAMAC_STATUS_OK )
     {
         return false;
