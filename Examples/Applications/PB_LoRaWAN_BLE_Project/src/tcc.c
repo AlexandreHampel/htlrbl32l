@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include "i2c.h"
 #include "sx126x.h"
+
+#include "radio.h"
 #include "sx126x_board.h"
 #include <LoRa.h>
 
@@ -48,6 +50,8 @@ void health(){
 	}
 	else{
 		printf("Termometro esta funcionando\n");
+		SX126xCheckDeviceReady();
+		printf("RADIO PRONTO\n");
 	}
 }
 
@@ -257,19 +261,18 @@ void startButton(){
 }
 
 void sendLoraFrame(){
-	lora_AppData_t tx_payload;
-	HT_LoRa_Process lora_process = PROCESS_LORA_READY;
-	HT_Payload payload = {0};
+	if(segundos % 10 == 0){
+    sprintf((char*)buf,
+          "%u.%u °C",
+          ((unsigned int)temp_c / 100),
+          ((unsigned int)temp_c % 100));
 
-	if(strlen((char *)payload.data) == 0)
-		sprintf((char *)payload.data, "Hello, World!");
 
-	tx_payload.Buff = (uint8_t *)&payload.data;
-	tx_payload.BuffSize = strlen((char *)payload.data) == 0 ? PAYLOAD_SIZE + 1 : strlen((char *)payload.data) + 1;
-	tx_payload.Port = LORAWAN_APP_PORT;
+	SX126xSendPayload(buf, sizeof(buf), 5);
+	printf("%d",LoRaMacIsBusy);
 
-	lora_process = PROCESS_LORA_TX;
-	lorawan_send(&tx_payload);
+
+	}
 }
 
 void reportTemp(){

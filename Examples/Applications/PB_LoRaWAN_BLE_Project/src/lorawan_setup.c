@@ -76,6 +76,7 @@ void LORAWAN_init(uint8_t region){
 	HAL_NVIC_DisableIRQ(GPIOB_IRQn);
 	//radio reset to avoid undefined behavior
 	SX126xReset();
+	SX126xWakeup();
 	//sets LoRaWAN region	
 	setRegion(region);
 	//clears LoRa Radio Interruptions

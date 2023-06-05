@@ -84,7 +84,6 @@ int main(void) {
 	while(!LORA_JoinStatus()){ // wait for join accept
 		LORAWAN_tick();
 	}
-	//HAL_Delay(5000);
 
 
 	printf("Bem vindo!\n");
@@ -104,17 +103,16 @@ int main(void) {
 	timerStart();
 
 
+
 	while (1){
 		if(returnStatus() == 0){
 			temp();
 			timer();
 			check();
 			reportTemp();
-			SX126xCheckDeviceReady();
-			printf("RADIO PRONTO\n");
 			LORAWAN_tick();
 			sendLoraFrame();
-			HAL_Delay(100000);
+			HAL_Delay(1000);
 			}
 	}
 
